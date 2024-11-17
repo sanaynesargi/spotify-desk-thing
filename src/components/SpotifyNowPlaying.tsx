@@ -11,7 +11,9 @@ import PlayerControls from "./PlayerControls/PlayerControls";
 import Screensaver from "./Screensaver";
 import SvgMusic from "./icons/bx-music.svg";
 
-const PREVIEW_SIZE = 400;
+// Variables to control album art size and text scale
+const PREVIEW_SIZE = 250; // Increased album art size for better visibility
+const TEXT_SCALE = 1.5; // Controls the scale of text (title and subtitle)
 
 const getAlbumMetadata = ({
   album,
@@ -57,7 +59,6 @@ const SpotifyNowPlaying: Component = () => {
     let interval: number;
     let refreshTimeout = !!thisNowPlaying?.is_playing ? 8000 : 15000;
     if (thisNowPlaying !== undefined) {
-
       const songDuration = thisNowPlaying?.item?.duration_ms ?? 0;
       const currentProgress = thisNowPlaying?.progress_ms ?? 0;
 
@@ -65,10 +66,12 @@ const SpotifyNowPlaying: Component = () => {
       if (thisNowPlaying?.is_playing && timeLeftOnSong < refreshTimeout) {
         refreshTimeout = timeLeftOnSong + 1000;
       }
-
     }
 
-    interval = setInterval(() => utils.metadata.nowPlaying.invalidate(), refreshTimeout);
+    interval = setInterval(
+      () => utils.metadata.nowPlaying.invalidate(),
+      refreshTimeout
+    ) as any;
 
     onCleanup(() => {
       clearInterval(interval);
@@ -101,47 +104,73 @@ const SpotifyNowPlaying: Component = () => {
   });
 
   return (
-    <div class="w-full h-full">
+    <div class="w-full h-full flex justify-center items-center bg-black">
       {showScreensaver() ? (
         <Screensaver />
       ) : (
-        <DynamicBackground imgUrl={metadata()?.preview}>
-          <div class="flex flex-col items-center">
-            <div
-              class="bg-gray-800 relative flex items-center justify-center color-gray-500"
-              style={{
-                width: `${PREVIEW_SIZE}px`,
-                height: `${PREVIEW_SIZE}px`,
-              }}
-            >
-              <div class="absolute z-0">
-                <img
-                  src={SvgMusic}
-                  width={`${PREVIEW_SIZE / 2}px`}
-                  height={`${PREVIEW_SIZE / 2}px`}
-                />
+        <DynamicBackground imgUrl={metadata()?.preview} class="blur-3xl">
+          {/* Centered Horizontal Layout with Album Art and Text */}
+          <div class="flex justify-center items-center w-full px-6 py-6">
+            {/* Full Width Flexbox Container */}
+            <div class="flex items-center justify-center w-full max-w-screen-lg">
+              {/* Album Art */}
+              <div class="flex-shrink-0 mr-6">
+                <div
+                  class="relative"
+                  style={{
+                    width: `${PREVIEW_SIZE}px`,
+                    height: `${PREVIEW_SIZE}px`,
+                  }}
+                >
+                  <div class="absolute z-0">
+                    <img
+                      src={SvgMusic}
+                      width={`${PREVIEW_SIZE / 2}px`}
+                      height={`${PREVIEW_SIZE / 2}px`}
+                    />
+                  </div>
+                  <div
+                    class="relative z-10"
+                    style={{
+                      width: `${PREVIEW_SIZE}px`,
+                      height: `${PREVIEW_SIZE}px`,
+                      "background-image": `url(${metadata()?.preview})`,
+                      "background-position": "center center",
+                      "background-repeat": "no-repeat",
+                      "background-size": "cover",
+                    }}
+                  />
+                </div>
               </div>
-              <div
-                class="relative z-10"
-                style={{
-                  width: `${PREVIEW_SIZE}px`,
-                  height: `${PREVIEW_SIZE}px`,
-                  "background-image": `url(${metadata()?.preview})`,
-                  "background-position": "center center",
-                  "background-repeat": "no-repeat",
-                  "background-size": "contain",
-                }}
-              />
+
+              {/* Text Info */}
+              <div class="flex flex-col justify-start text-white">
+                <p
+                  class="font-extrabold text-ellipsis overflow-hidden"
+                  style={{
+                    "font-size": `${TEXT_SCALE * 1.5}rem`, // Title scaled by TEXT_SCALE
+                    "max-width": "400px", // Control text overflow
+                  }}
+                >
+                  {metadata()?.title}
+                </p>
+                <p
+                  class="opacity-75 text-ellipsis overflow-hidden"
+                  style={{
+                    "font-size": `${TEXT_SCALE * 1.25}rem`, // Subtitle scaled by TEXT_SCALE
+                    "max-width": "400px", // Control text overflow
+                  }}
+                >
+                  {metadata()?.subtitle}
+                </p>
+              </div>
             </div>
-            <p class="font-extrabold text-5xl pt-7 pb-2 text-ellipsis overflow-hidden whitespace-nowrap max-w-xl leading-lg">
-              {metadata()?.title}
-            </p>
-            <p class="opacity-75 text-2xl font-bold text-ellipsis overflow-hidden whitespace-nowrap max-w-xl">
-              {metadata()?.subtitle}
-            </p>
           </div>
 
-          <PlayerControls isSaved={!!isSavedQuery.data?.[0]} />
+          {/* Player Controls */}
+          <div class="absolute bottom-4 w-full px-4">
+            <PlayerControls isSaved={!!isSavedQuery.data?.[0]} />
+          </div>
         </DynamicBackground>
       )}
     </div>

@@ -5,7 +5,8 @@ import {
   useSpotifyAuth,
 } from "~/components/hooks/useSpotifyAuth";
 
-const CARD_SIZE = 715;
+const CARD_WIDTH = 715; // Card width
+const CARD_HEIGHT = 500; // Adjusted card height for a 16:9 aspect ratio (~800x480 resolution)
 
 export default function Home() {
   useSpotifyAuth();
@@ -36,29 +37,18 @@ export default function Home() {
   });
 
   return (
-    <main>
+    <main class="bg-black min-h-screen flex items-center justify-center">
       {isAuthenticated() && (
-        <div class="flex items-center justify-center w-screen h-screen text-white">
+        <div class="relative">
           <div
-            class="relative flex"
+            class="relative text-white rounded-3xl overflow-hidden"
             style={{
-              flex: "none",
-              width: `${CARD_SIZE}px`,
-              height: `${CARD_SIZE}px`,
+              width: `${CARD_WIDTH}px`,
+              height: `${CARD_HEIGHT}px`,
+              transform: "translateZ(0)", // Fix for rounded corners in webkit
             }}
           >
-            <div
-              class="relative text-white rounded-3xl overflow-hidden"
-              style={{
-                flex: "none",
-                width: `${CARD_SIZE}px`,
-                height: `${CARD_SIZE}px`,
-                transform: `translateZ(0)`, // Fix for rounded corners in webkit
-                "scroll-snap-align": "center",
-              }}
-            >
-              <SpotifyNowPlaying />
-            </div>
+            <SpotifyNowPlaying />
           </div>
         </div>
       )}
