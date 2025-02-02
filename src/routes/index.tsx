@@ -52,7 +52,7 @@ export default function Home() {
           </div>
         </div>
       )}
-      {showAuthError() && (
+      {/* {showAuthError() && (
         <div class="grid items-center justify-center h-screen">
           <p class="text-white text-center max-w-sm">
             Unable to authenticate with API. Have you set the proper auth tokens
@@ -60,7 +60,7 @@ export default function Home() {
             instructions)
           </p>
         </div>
-      )}
+      )} */}
     </main>
   );
 }
